@@ -10,5 +10,11 @@ pipeline {
             }
 
         }
+        stage ('build with maven') {
+            steps {
+                sh 'ls -lthr'
+                sh 'cd spring-boot-app && mvn clean package'
+            }
+        }
     }
 }
