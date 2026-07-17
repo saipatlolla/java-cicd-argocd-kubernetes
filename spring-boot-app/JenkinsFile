@@ -42,5 +42,24 @@ pipeline {
                 }
             }    
         }
+        stage('Update Deployment file') {
+            environment {
+                GIT_REPO_NAME = "java-cicd-argocd-kubernetes"
+                GIT_USER_NAME = "saipatlolla"
+            }
+            steps {
+                withCredentials([string(credentialsId: 'Github-creds', variable: 'GITHUB_TOKEN')]) {
+                    sh '''
+                        git config user.email "sairajpatlolla@gmail.com"
+                        git config user.name "saipatlolla"
+                        BUILD_NUMBER=${BUILD_NUMBER}
+                        sed -i "s/replaceImageTag/${BUILD_NUMBER}/g" spring-boot-app-manifests/deployment.yml
+                        git add spring-boot-app-manifests/deployment.yml
+                        git commit -m "Update deployment image to version ${BUILD_NUMBER}"
+                        git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
+                    '''
+                }     
+            }
+        }
     }
 }
